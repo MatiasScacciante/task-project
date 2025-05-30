@@ -1,10 +1,13 @@
 services:
   - type: web
-    name: task-app
+    name: task-project
     env: node
     plan: free
-    buildCommand: cd building-maintenance-backend && npm install && cd ../task-frontend && npm install && npm run build
-    startCommand: cd building-maintenance-backend && node index.js
+    buildCommand: |
+      cd frontend && npm install && npm run build
+      cd ../backend && npm install
+    startCommand: node src/index.js
+    rootDir: backend
     envVars:
       - key: NODE_VERSION
-        value: 18
+        value: 20

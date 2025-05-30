@@ -2,6 +2,7 @@ const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,11 +12,13 @@ app.use(cors());
 app.use(express.json());
 
 // Base de datos
-const db = new sqlite3.Database('./src/db.sqlite', (err) => {
+const dbPath = path.join(__dirname, 'db.sqlite');
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) console.error('❌ Error opening database', err);
   else console.log('✅ Connected to SQLite database');
 });
 
+// Crear tabla si no existe
 db.serialize(() => {
   db.run(`CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -28,7 +31,9 @@ db.serialize(() => {
   )`);
 });
 
+// =======================
 // Rutas API
+// =======================
 app.get('/tasks', (req, res) => {
   db.all('SELECT * FROM tasks', (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
@@ -89,16 +94,23 @@ app.delete('/tasks/:id', (req, res) => {
   });
 });
 
+// =======================
 // Servir React (build)
-const buildPath = path.join(__dirname, '../frontend/build');
-app.use(express.static(buildPath));
+// =======================
+const buildPath = path.join(__dirname, '../../frontend/build');
 
-// Redirigir todo lo que no sea API a React
-app.get('*', (req, res) => {
-  res.sendFile(path.join(buildPath, 'index.html'));
-});
+if (fs.existsSync(buildPath)) {
+  app.use(express.static(buildPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+} else {
+  console.warn('⚠️ Build folder not found, React app will not be served.');
+}
 
+// =======================
 // Iniciar servidor
+// =======================
 app.listen(PORT, () =>
   console.log(`🚀 Server running on http://localhost:${PORT}`)
 );

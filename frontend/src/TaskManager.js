@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const API_URL = 'http://localhost:3000/tasks';
+const API_URL = '/api/tasks';
 
 function TaskManager({ user }) {
   const [tasks, setTasks] = useState([]);
