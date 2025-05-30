@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: task-backend
+    name: task-app
     env: node
     plan: free
     buildCommand: cd building-maintenance-backend && npm install && cd ../task-frontend && npm install && npm run build
@@ -8,4 +8,3 @@ services:
     envVars:
       - key: NODE_VERSION
         value: 18
-    autoDeploy: true
