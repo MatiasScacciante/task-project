@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: task-backend
+    env: node
+    plan: free
+    buildCommand: cd building-maintenance-backend && npm install && cd ../task-frontend && npm install && npm run build
+    startCommand: cd building-maintenance-backend && node index.js
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+    autoDeploy: true
